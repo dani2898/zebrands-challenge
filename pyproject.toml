@@ -13,6 +13,7 @@ uvicorn = {extras = ["standard"], version = "^0.15.0"}
 shortuuid = "^1.0.1"
 psycopg2 = "^2.8.6"
 alembic = "^1.6.5"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 
 [build-system]
 requires = ["poetry>=1.0.0"]
