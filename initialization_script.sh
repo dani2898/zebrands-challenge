@@ -15,7 +15,7 @@ echo "==> Environment: Developer"
 # This will start the fastAPI as the primary process and put it in the background
 # (Will setup as reload for development purposes)
 echo "==> FastAPI startup"
-poetry run uvicorn main:app --reload --host 0.0.0.0 --port 5006 &
+poetry run uvicorn main:app --reload --host 0.0.0.0 --port 5001 &
 
 echo "==> FastAPI setup, Finish ..."
 
