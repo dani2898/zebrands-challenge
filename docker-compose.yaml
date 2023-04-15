@@ -1,0 +1,37 @@
+version: "1"
+
+services:
+
+  # Zebrands Microservice 
+  zebrands:
+    build:
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    command: sh initialization_script.sh
+    volumes:
+      - .:/code
+    ports:
+      - "5001:5001"
+    depends_on: 
+      - storage
+    tty: true
+
+  # There is a prebuilt PostgreSQL image
+  # see https://hub.docker.com/_/postgres/
+  storage:
+    image: "postgres:12.2-alpine"
+    environment:
+      POSTGRES_USER: zebrands
+      POSTGRES_PASSWORD: zebrands_pass
+      POSTGRES_DB: zebrands
+    mem_reservation: 128M
+    ports:
+      - "5432:5432"
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+
+volumes:
+  database-data:
+  data-volume:
+  static-files:
