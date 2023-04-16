@@ -5,6 +5,7 @@ from sqlalchemy.orm.session import Session
 
 from app.infrastructure.postgres.database import SessionLocal
 
+# User
 from app.domain.user import UserRepository
 
 from app.infrastructure.postgres.user import (
@@ -22,6 +23,24 @@ from app.usecase.user import (
     UserQueryUsecaseImpl,
 )
 
+# Product
+
+from app.domain.product import ProductRepository
+
+from app.infrastructure.postgres.product import (
+    ProductCommandUsecaseUnitOfWorkImpl,
+    ProductQueryServiceImpl,
+    ProductRepositoryImpl
+    )
+
+from app.usecase.product import (
+    ProductCommandUsecase,
+    ProductCommandUsecaseImpl,
+    ProductCommandUsecaseUnitOfWork,
+    ProductQueryService,
+    ProductQueryUsecase,
+    ProductQueryUsecaseImpl,
+)
 
 def get_session() -> Iterator[Session]:
     session: Session = SessionLocal()
@@ -30,6 +49,7 @@ def get_session() -> Iterator[Session]:
     finally:
         session.close()
 
+# USER DEFINITION SESSION MANAGER
 
 def user_query_usecase(session: Session = Depends(get_session)) -> UserQueryUsecase:
     user_query_service: UserQueryService = UserQueryServiceImpl(session)
@@ -42,3 +62,17 @@ def user_command_usecase(session: Session = Depends(get_session)) -> UserCommand
         user_repository=user_repository,
     )
     return UserCommandUsecaseImpl(uow)
+
+# PRODUCT DEFINITION SESSION MANAGER
+
+def product_query_usecase(session: Session = Depends(get_session)) -> ProductQueryUsecase:
+    product_query_service: ProductQueryService = ProductQueryServiceImpl(session)
+    return ProductQueryUsecaseImpl(product_query_service)
+
+def product_command_usecase(session: Session = Depends(get_session)) -> ProductCommandUsecase:
+    product_repository: ProductRepository = ProductRepositoryImpl(session)
+    uow: ProductCommandUsecaseUnitOfWork = ProductCommandUsecaseUnitOfWorkImpl(
+        session,
+        product_repository=product_repository,
+    )
+    return ProductCommandUsecaseImpl(uow)
