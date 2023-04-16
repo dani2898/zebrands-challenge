@@ -58,6 +58,9 @@ class UserCommandUsecase(ABC):
     def update_user(self, user_id: str, data: UserUpdateModel)-> Optional[UserReadModel]:
         raise NotImplementedError
 
+    @abstractmethod
+    def delete_user_by_id(self, user_id: str):
+        raise NotImplementedError
 
 class UserCommandUsecaseImpl(UserCommandUsecase):
     """
@@ -139,3 +142,17 @@ class UserCommandUsecaseImpl(UserCommandUsecase):
             raise
 
         return UserReadModel.from_entity(cast(User, updated_user))
+    
+    def delete_user_by_id(self, id: str):
+        try:
+            existing_user = self.uow.user_repository.find_by_id(id)
+            if existing_user is None:
+                raise UserNotFoundError
+
+            self.uow.user_repository.delete_user_by_id(id)
+
+            self.uow.commit()
+
+        except Exception:
+            self.uow.rollback()
+            raise

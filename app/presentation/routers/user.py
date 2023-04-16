@@ -74,7 +74,6 @@ async def create_user(
 async def update_user(
     user_id: str,
     data: UserUpdateModel,
-    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase),
     user_command_usecase: UserCommandUsecase = Depends(user_command_usecase),
 ):
     try:
@@ -97,3 +96,30 @@ async def update_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
     return updated_user
+
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorMessageUserNotFound,
+        },
+    }
+)
+async def delete_user(
+    user_id: str,
+    user_command_usecase: UserCommandUsecase = Depends(user_command_usecase),
+):
+    try:
+        user_command_usecase.delete_user_by_id(user_id)
+
+    except UserNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

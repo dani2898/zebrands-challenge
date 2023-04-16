@@ -22,3 +22,7 @@ class UserRepository(ABC):
     @abstractmethod
     def update(self, user_id: str, user: User) -> Optional[User]:
         raise NotImplementedError
+    
+    @abstractmethod
+    def delete_user_by_id(self, user_id: str):
+        raise NotImplementedError

@@ -53,6 +53,12 @@ class UserRepositoryImpl(UserRepository):
         except Exception:
             raise
 
+    def delete_user_by_id(self, id: str):
+        try:
+            self.session.query(UserDTO).filter_by(id=id).delete()
+        except:
+            raise
+
 class UserCommandUsecaseUnitOfWorkImpl(UserCommandUsecaseUnitOfWork):
     def __init__(
         self,
