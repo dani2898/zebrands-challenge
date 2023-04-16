@@ -28,10 +28,10 @@ def upgrade():
     user = op.create_table(
         'user',
         sa.Column('id', UUID(), autoincrement=False, nullable=False),
-        sa.Column('email', sa.String(), unique=True, nullable=False),
-        sa.Column('password', sa.String(), nullable=False),
-        sa.Column('firstname', sa.String(), nullable=False),
-        sa.Column('lastname', sa.String(), nullable=True),
+        sa.Column('email', sa.String(255), unique=True, nullable=False),
+        sa.Column('password', sa.String(255), nullable=False),
+        sa.Column('firstname', sa.String(255), nullable=False),
+        sa.Column('lastname', sa.String(255), nullable=True),
         sa.Column('created_at', sa.DateTime, nullable=False, index=True),
         sa.Column('updated_at', sa.DateTime, nullable=False, index=True),
         sa.PrimaryKeyConstraint('id'),
@@ -41,8 +41,8 @@ def upgrade():
     brand = op.create_table(
         'brand',
         sa.Column('id', UUID(), autoincrement=False, nullable=False),
-        sa.Column('name', sa.String(), nullable=False),
-        sa.Column('description', sa.String(), nullable=False),
+        sa.Column('name', sa.String(255), nullable=False),
+        sa.Column('description', sa.String(255), nullable=False),
         sa.Column('created_at', sa.DateTime, nullable=False, index=True),
         sa.Column('updated_at', sa.DateTime, nullable=False, index=True),
         sa.PrimaryKeyConstraint('id'),
@@ -52,9 +52,9 @@ def upgrade():
     op.create_table(
         'product',
         sa.Column('id', UUID(), autoincrement=False, nullable=False),
-        sa.Column('sku', sa.String(), unique=True, nullable=False),
-        sa.Column('name', sa.String(), nullable=False),
-        sa.Column('description', sa.String(), nullable=False),
+        sa.Column('sku', sa.String(255), unique=True, nullable=False),
+        sa.Column('name', sa.String(255), nullable=False),
+        sa.Column('description', sa.String(255), nullable=False),
         sa.Column('stock', sa.Integer, nullable=False, default=0),
         sa.Column('price', sa.DECIMAL(10, 2), nullable=False),
         sa.Column('status', sa.Boolean, nullable=False),
@@ -68,7 +68,7 @@ def upgrade():
     #product querying table
     op.create_table(
         'product_consult',
-        sa.Column('id', sa.String(), autoincrement=False, nullable=False),
+        sa.Column('id', UUID(), autoincrement=False, nullable=False),
         sa.Column('product_id', UUID(), nullable=False),
         sa.Column('created_at', sa.DateTime, nullable=False, index=True),
         sa.Column('updated_at', sa.DateTime, nullable=False, index=True),
