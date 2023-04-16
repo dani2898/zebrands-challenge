@@ -40,7 +40,7 @@ async def login(
     user_command_usecase: UserCommandUsecase = Depends(user_command_usecase),
 ):
     
-    user = user_query_usecase.fetch_user_by_email(data.email)
+    user = user_query_usecase.get_user_by_email(data.email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

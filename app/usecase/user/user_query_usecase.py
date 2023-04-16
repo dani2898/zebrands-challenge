@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import List, Optional
 
 from app.domain.user import UserNotFoundError
 
@@ -11,9 +11,12 @@ class UserQueryUsecase(ABC):
     """UserQueryUsecase defines a query usecase inteface related User entity."""
 
     @abstractmethod
-    def fetch_user_by_email(self, email: str) -> Optional[UserReadModel]:
+    def get_user_by_email(self, email: str) -> Optional[UserReadModel]:
         raise NotImplementedError
 
+    @abstractmethod
+    def get_users(self) -> List[UserReadModel]:
+        raise NotImplementedError
 
 class UserQueryUsecaseImpl(UserQueryUsecase):
     """UserQueryUsecaseImpl implements a query usecases related User entity."""
@@ -21,7 +24,7 @@ class UserQueryUsecaseImpl(UserQueryUsecase):
     def __init__(self, user_query_service: UserQueryService):
         self.user_query_service: UserQueryService = user_query_service
 
-    def fetch_user_by_email(self, email: str) -> Optional[UserReadModel]:
+    def get_user_by_email(self, email: str) -> Optional[UserReadModel]:
         try:
             user = self.user_query_service.find_by_email(email)
             if user is None:
@@ -30,4 +33,12 @@ class UserQueryUsecaseImpl(UserQueryUsecase):
             raise
 
         return user
+    
+    def get_users(self) -> List[UserReadModel]:
+        try:
+            users = self.user_query_service.find_all()
+        except:
+            raise
+
+        return users
 

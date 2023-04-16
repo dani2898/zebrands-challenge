@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
@@ -23,3 +23,18 @@ class UserQueryServiceImpl(UserQueryService):
         except:
             raise
         return user_dto.to_read_model()
+    
+    def find_all(self) -> List[UserReadModel]:
+        try:
+            user_dtos = (
+                self.session.query(UserDTO)
+                .order_by(UserDTO.email)
+                .limit(50)
+                .all()
+            )
+        except:
+            raise
+        if len(user_dtos) == 0:
+            return []
+
+        return list(map(lambda user_dto: user_dto.to_read_model(), user_dtos))

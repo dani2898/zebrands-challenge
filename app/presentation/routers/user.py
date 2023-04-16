@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_jwt_auth import AuthJWT
 
@@ -123,3 +124,31 @@ async def delete_user(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+@router.get(
+    "/",
+    response_model=List[UserReadModel],
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorMessageUserNotFound,
+        },
+    }
+)
+async def list_users(
+    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase),
+):
+    try:
+        users = user_query_usecase.get_users()
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    if len(users) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=UserNotFoundError.message,
+        )
+
+    return users
