@@ -12,13 +12,26 @@ class UserLoginModel(BaseModel):
     )
 
 class UserCreateModel(BaseModel):
-    """UserLoginModel represents a model for user login."""
+    """UserCreateModel represents a model for user creation."""
 
     email: str = Field(
         example="example@test.com"
     )
     password: str = Field(
         example="password"
+    )
+    firstname: str = Field(
+        example="firstname"
+    )
+    lastname: str = Field(
+        example="lastname"
+    )
+
+class UserUpdateModel(BaseModel):
+    """UserUpdateModel represents a model for user update."""
+
+    email: str = Field(
+        example="example@test.com"
     )
     firstname: str = Field(
         example="firstname"

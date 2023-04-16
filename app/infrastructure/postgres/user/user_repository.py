@@ -39,6 +39,20 @@ class UserRepositoryImpl(UserRepository):
         except:
             raise
 
+    def update(self, user_id: str, user: User):
+        user_dto = UserDTO.from_entity(user)
+        try:
+            _user = self.session.query(UserDTO).filter_by(
+                id=user_id
+            ).one()
+            _user.email = user_dto.email
+            _user.firstname = user_dto.firstname
+            _user.lastname = user_dto.lastname
+            _user.updated_at = user_dto.updated_at
+
+        except Exception:
+            raise
+
 class UserCommandUsecaseUnitOfWorkImpl(UserCommandUsecaseUnitOfWork):
     def __init__(
         self,

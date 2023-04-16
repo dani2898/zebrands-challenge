@@ -9,9 +9,14 @@ from app.domain.user import (
     User, 
     UserRepository,
     EmailAlreadyExistError,
+    UserNotFoundError
     )
 
-from .user_command_model import UserCreateModel
+from .user_command_model import(
+    UserCreateModel,
+    UserUpdateModel
+)
+
 from .user_query_model import UserReadModel
 
 class UserCommandUsecaseUnitOfWork(ABC):
@@ -47,6 +52,10 @@ class UserCommandUsecase(ABC):
     
     @abstractmethod
     def create_user(self, data: UserCreateModel)-> Optional[UserReadModel]:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def update_user(self, user_id: str, data: UserUpdateModel)-> Optional[UserReadModel]:
         raise NotImplementedError
 
 
@@ -98,3 +107,35 @@ class UserCommandUsecaseImpl(UserCommandUsecase):
 
         return UserReadModel.from_entity(cast(User, created_user))
 
+    def update_user(
+        self, user_id: str, data: UserUpdateModel
+    ) -> Optional[UserReadModel]:
+        try:
+            existing_user = self.uow.user_repository.find_by_id(user_id)
+            if existing_user is None:
+                raise UserNotFoundError
+            
+            email_exist = self.uow.user_repository.find_by_email(data.email)
+            
+            if email_exist is not None:
+                raise EmailAlreadyExistError
+            
+            user = User(
+                id=existing_user.id,
+                email=data.email,
+                password=existing_user.password,
+                firstname=data.firstname,
+                lastname=data.lastname,
+                created_at=existing_user.created_at,
+                updated_at=datetime.now()
+            )
+            self.uow.user_repository.update(user_id, user)
+            self.uow.commit()
+            
+            updated_user = self.uow.user_repository.find_by_id(user_id)
+
+        except Exception:
+            self.uow.rollback()
+            raise
+
+        return UserReadModel.from_entity(cast(User, updated_user))

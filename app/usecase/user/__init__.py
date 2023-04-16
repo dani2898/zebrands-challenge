@@ -1,5 +1,6 @@
 from .user_command_model import (
     UserCreateModel,
+    UserUpdateModel,
     UserLoginModel
     )   
 

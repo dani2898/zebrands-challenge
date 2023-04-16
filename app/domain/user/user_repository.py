@@ -18,3 +18,7 @@ class UserRepository(ABC):
     @abstractmethod
     def create(self, user: User) -> Optional[User]:
         raise NotImplementedError
+    
+    @abstractmethod
+    def update(self, user_id: str, user: User) -> Optional[User]:
+        raise NotImplementedError
