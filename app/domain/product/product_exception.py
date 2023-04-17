@@ -3,3 +3,9 @@ class ProductNotFoundError(Exception):
 
     def __str__(self):
         return ProductNotFoundError.message
+    
+class SkuAlreadyExistError(Exception):
+    message = "Sku already exists"
+
+    def __str__(self):
+        return SkuAlreadyExistError.message

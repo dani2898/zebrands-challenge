@@ -1,3 +1,5 @@
+from .product_command_model import ProductCreateModel
+
 from .product_query_model import ProductReadModel
 
 from .product_query_service import ProductQueryService

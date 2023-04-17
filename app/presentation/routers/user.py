@@ -22,7 +22,6 @@ from app.usecase.user import (
     UserUpdateModel,
     UserQueryUsecase,
     UserReadModel,
-
 )
 
 

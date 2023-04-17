@@ -28,7 +28,7 @@ class ProductReadModel(BaseModel):
         example=1
     )
     brand_id: str = Field(
-        example="65c4a456-6f01-4d5c-8397-6bcb8dd43286"
+        example="uuid"
     )
     created_at: datetime = Field(example='2023-15-04T08:23:45+00:00')
     updated_at: datetime = Field(example='2023-15-04T08:23:45+00:00')
@@ -46,7 +46,7 @@ class ProductReadModel(BaseModel):
             stock=product.stock,
             price=product.price,
             status=product.status,
-            brand_id=product.brand_id,
+            brand_id=str(product.brand_id),
             created_at=product.created_at,
             updated_at=product.updated_at,
         )

@@ -1,6 +1,6 @@
 
 from datetime import datetime
-from sqlalchemy import Boolean, Column, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, Integer, String, DateTime, Numeric
 from typing import Union
 
 from app.domain.product import Product
@@ -18,7 +18,7 @@ class ProductDTO(Base):
     name: Union[str, Column] = Column(String(255), nullable=False)
     description: Union[str, Column] = Column(String(255), nullable=False)
     stock: Union[int, Column] = Column(Integer, nullable=True)
-    price: Union[float, Column] = Column(float, nullable=True)
+    price: Union[Numeric, Column] = Column(Numeric, nullable=True)
     status: Union[bool, Column] = Column(Boolean, nullable=True)
     brand_id: Union[int, Column] = Column(String(255), nullable=True)
     created_at: Union[datetime, Column] = Column(DateTime, index=True, nullable=False)
