@@ -6,11 +6,13 @@ from uuid import uuid4
 from app.domain.product import (
     Product,
     ProductRepository,
-    SkuAlreadyExistError
+    SkuAlreadyExistError,
+    ProductNotFoundError
     )
 
 from .product_command_model import (
-    ProductCreateModel
+    ProductCreateModel,
+    ProductUpdateModel
 )
 
 from .product_query_model import ProductReadModel
@@ -45,6 +47,9 @@ class ProductCommandUsecase(ABC):
     def create_product(self, data: ProductCreateModel)-> Optional[ProductReadModel]:
         raise NotImplementedError
 
+    @abstractmethod
+    def update_product(self, product_id: str, data: ProductUpdateModel)-> Optional[ProductReadModel]:
+        raise NotImplementedError
 
 class ProductCommandUsecaseImpl(ProductCommandUsecase):
     """
@@ -89,3 +94,52 @@ class ProductCommandUsecaseImpl(ProductCommandUsecase):
             raise
 
         return ProductReadModel.from_entity(cast(Product, created_product))
+    
+    def update_product(
+        self, product_id: str, data: ProductUpdateModel
+    ) -> Optional[ProductReadModel]:
+        try:
+            existing_product = self.uow.product_repository.find_by_id(product_id)
+            if existing_product is None:
+                raise ProductNotFoundError
+            
+            sku_exist = self.uow.product_repository.find_by_sku(data.sku)
+            
+            if sku_exist and sku_exist.sku != existing_product.sku:
+                raise SkuAlreadyExistError
+            
+            product = Product(
+                id=existing_product.id,
+                sku=data.sku,
+                name=data.name,
+                description=data.description,
+                stock=data.stock,
+                price=data.price,
+                status=data.status,
+                brand_id=data.brand_id,
+                created_at=existing_product.created_at,
+                updated_at=datetime.now()
+            )
+            self.uow.product_repository.update(product_id, product)
+            self.uow.commit()
+            
+            updated_product = self.uow.product_repository.find_by_id(product_id)
+        except Exception:
+            self.uow.rollback()
+            raise
+
+        return ProductReadModel.from_entity(cast(Product, updated_product))
+    
+    def delete_product_by_id(self, id: str):
+        try:
+            existing_product = self.uow.product_repository.find_by_id(id)
+            if existing_product is None:
+                raise ProductNotFoundError
+
+            self.uow.product_repository.delete_product_by_id(id)
+
+            self.uow.commit()
+
+        except Exception:
+            self.uow.rollback()
+            raise

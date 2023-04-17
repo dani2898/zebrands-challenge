@@ -25,3 +25,8 @@ class ProductCreateModel(BaseModel):
     brand_id: str = Field(
         example="uuid"
     )
+
+class ProductUpdateModel(ProductCreateModel):
+    """ProductUpdateModel represents a model for product creation."""
+
+    pass

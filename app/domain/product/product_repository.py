@@ -17,3 +17,11 @@ class ProductRepository(ABC):
     @abstractmethod
     def create(self, product: Product) -> Optional[Product]:
         raise NotImplementedError
+    
+    @abstractmethod
+    def update(self, product_id: str, product: Product) -> Optional[Product]:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def delete_product_by_id(self, id: str):
+        raise NotImplementedError

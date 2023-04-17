@@ -1,4 +1,7 @@
-from .product_command_model import ProductCreateModel
+from .product_command_model import (
+    ProductCreateModel,
+    ProductUpdateModel
+    )
 
 from .product_query_model import ProductReadModel
 

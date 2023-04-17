@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.domain.product import (
-    SkuAlreadyExistError
+    SkuAlreadyExistError,
+    ProductNotFoundError
 )
 from app.presentation.schema.product.product_errors import (
-    ErrorMessageSkuAlreadyExists
+    ErrorMessageSkuAlreadyExists,
+    ErrorMessageProductNotFound
 )
 
 from app.interface_adapters.session.session_manager import (
@@ -15,6 +17,7 @@ from app.interface_adapters.session.session_manager import (
 from app.usecase.product import (
     ProductCommandUsecase,
     ProductCreateModel,
+    ProductUpdateModel,
     ProductReadModel
 )
 
@@ -49,3 +52,67 @@ async def create_product(
         )
 
     return product
+
+@router.put(
+    "/{product_id}",
+    response_model=ProductReadModel,
+    status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorMessageProductNotFound,
+        },
+    },
+)
+async def update_product(
+    product_id: str,
+    data: ProductUpdateModel,
+    product_command_usecase: ProductCommandUsecase = Depends(product_command_usecase),
+):
+    try:
+        updated_product = product_command_usecase.update_product(
+            product_id, data
+        )
+    except ProductNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    except SkuAlreadyExistError as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=e.message,
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    return updated_product
+
+@router.delete(
+    "/{product_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorMessageProductNotFound,
+        },
+    }
+)
+async def delete_product(
+    product_id: str,
+    product_command_usecase: ProductCommandUsecase = Depends(product_command_usecase),
+):
+    try:
+        product_command_usecase.delete_product_by_id(product_id)
+
+    except ProductNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
