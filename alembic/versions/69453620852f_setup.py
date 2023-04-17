@@ -83,7 +83,7 @@ def upgrade():
     [
         {'id': str(uuid.uuid4()), 'email':'danielavilla2898@gmail.com', 'password': super_admin_pwd,
          'firstname': 'Daniela', 'lastname': 'Villa', 'created_at': datetime.now(), 'updated_at': datetime.now()},
-        {'id': str(uuid.uuid4()), 'email':'example@test.com', 'password': super_admin_pwd,
+        {'id': str(uuid.uuid4()), 'email':'fasttest2023api@outlook.com', 'password': super_admin_pwd,
          'firstname': 'John', 'lastname': 'Smith',  'created_at': datetime.now(), 'updated_at': datetime.now()},
     ])
 
