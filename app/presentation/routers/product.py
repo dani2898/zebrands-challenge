@@ -13,6 +13,7 @@ from app.presentation.schema.product.product_errors import (
 from app.interface_adapters.session.session_manager import (
     product_query_usecase,
     product_command_usecase,
+    product_consult_command_usecase
 )
 
 from app.usecase.product import (
@@ -21,6 +22,10 @@ from app.usecase.product import (
     ProductCreateModel,
     ProductUpdateModel,
     ProductReadModel
+)
+
+from app.usecase.product_consult import (
+    ProductConsultCommandUsecase
 )
 
 router = APIRouter()
@@ -147,3 +152,33 @@ async def list_products(
         )
 
     return products
+
+@router.get(
+    "/{product_id}",
+    response_model=ProductReadModel,
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorMessageProductNotFound,
+        },
+    }
+)
+async def get_product_by_id(
+    product_id: str,
+    product_query_usecase: ProductQueryUsecase = Depends(product_query_usecase),
+    product_consult_command_usecase: ProductConsultCommandUsecase = Depends(product_consult_command_usecase),
+):
+    try:
+        product = product_query_usecase.get_product_by_id(product_id, product_consult_command_usecase)
+    except ProductNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=e.message,
+        )
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return product

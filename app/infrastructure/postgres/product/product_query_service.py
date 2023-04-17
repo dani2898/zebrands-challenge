@@ -1,6 +1,8 @@
+from typing import List, Optional
+
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
 
-from typing import List
 from app.usecase.product import ProductQueryService, ProductReadModel
 
 from .product_dto import ProductDTO
@@ -26,3 +28,16 @@ class ProductQueryServiceImpl(ProductQueryService):
             return []
 
         return list(map(lambda product_dto: product_dto.to_read_model(), product_dtos))
+
+    def find_by_id(self, product_id: str) -> Optional[ProductReadModel]:
+        try:
+            user_dto = self.session.query(ProductDTO).filter_by(
+                id=product_id,
+                status=True
+            ).one()
+
+        except NoResultFound:
+            return None
+        except:
+            raise
+        return user_dto.to_read_model()

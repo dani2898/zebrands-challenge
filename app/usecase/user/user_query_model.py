@@ -7,7 +7,7 @@ class UserReadModel(BaseModel):
     """UserReadModel represents data structure as a read model."""
 
     id: str = Field(
-        example="c56d20c7-ebc4-43f1-9808-4a298fd61554"
+        example="uuid"
     )
     email: str = Field(
         example="example@example.com"

@@ -42,6 +42,25 @@ from app.usecase.product import (
     ProductQueryUsecaseImpl,
 )
 
+# Product consult
+
+from app.domain.product_consult import ProductConsultRepository
+
+from app.infrastructure.postgres.product_consult import (
+    ProductConsultCommandUsecaseUnitOfWorkImpl,
+    ProductConsultQueryServiceImpl,
+    ProductConsultRepositoryImpl
+    )
+
+from app.usecase.product_consult import (
+    ProductConsultCommandUsecase,
+    ProductConsultCommandUsecaseImpl,
+    ProductConsultCommandUsecaseUnitOfWork,
+    ProductConsultQueryService,
+    ProductConsultQueryUsecase,
+    ProductConsultQueryUsecaseImpl,
+)
+
 def get_session() -> Iterator[Session]:
     session: Session = SessionLocal()
     try:
@@ -76,3 +95,17 @@ def product_command_usecase(session: Session = Depends(get_session)) -> ProductC
         product_repository=product_repository,
     )
     return ProductCommandUsecaseImpl(uow)
+
+# PRODUCT CONSULT DEFINITION SESSION MANAGER
+
+def product_consult_query_usecase(session: Session = Depends(get_session)) -> ProductConsultQueryUsecase:
+    product_consult_query_service: ProductConsultQueryService = ProductConsultQueryServiceImpl(session)
+    return ProductConsultQueryUsecaseImpl(product_consult_query_service)
+
+def product_consult_command_usecase(session: Session = Depends(get_session)) -> ProductConsultCommandUsecase:
+    product_consult_repository: ProductConsultRepository = ProductConsultRepositoryImpl(session)
+    uow: ProductConsultCommandUsecaseUnitOfWork = ProductConsultCommandUsecaseUnitOfWorkImpl(
+        session,
+        product_consult_repository=product_consult_repository,
+    )
+    return ProductConsultCommandUsecaseImpl(uow)

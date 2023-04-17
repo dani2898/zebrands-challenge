@@ -7,7 +7,7 @@ class ProductReadModel(BaseModel):
     """ProductReadModel represents data structure as a read model."""
 
     id: str = Field(
-        example="c56d20c7-ebc4-43f1-9808-4a298fd61554"
+        example="uuid"
     )
     sku: str = Field(
         example="XYZ12345"
