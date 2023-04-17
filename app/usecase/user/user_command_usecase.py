@@ -120,7 +120,7 @@ class UserCommandUsecaseImpl(UserCommandUsecase):
             
             email_exist = self.uow.user_repository.find_by_email(data.email)
             
-            if email_exist is not None:
+            if email_exist is not None and email_exist.email != existing_user.email:
                 raise EmailAlreadyExistError
             
             user = User(

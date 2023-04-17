@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi_jwt_auth.exceptions import AuthJWTException
 
 import app.config as conf
-from app.presentation.routers import auth, user
+from app.presentation.routers import auth, brand, user, product, product_consult
 
 app = FastAPI(
     title="Zebrands Backend",
@@ -37,7 +37,25 @@ app.include_router(
 )
 
 app.include_router(
+    brand.router,
+    prefix="/brand",
+    tags=["Brand"]
+)
+
+app.include_router(
     user.router,
     prefix="/user",
     tags=["User"]
+)
+
+app.include_router(
+    product.router,
+    prefix="/product",
+    tags=["Product"]
+)
+
+app.include_router(
+    product_consult.router,
+    prefix="/product_consult",
+    tags=["Product Consult"]
 )
