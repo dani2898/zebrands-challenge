@@ -43,7 +43,7 @@ En caso de que no se cuente con una configuración de docker en el equipo, favor
 	"zebrands" es el nombre que se especifica en el docker-compose.yaml para crear el contenedor.
 	`docker-compose logs -f --tail 30 zebrands`
 
-	Anexo captura:
+Anexo captura:
 
 ![Screenshot_3](https://user-images.githubusercontent.com/61600273/232625243-4ad4f197-4c17-4b33-935b-24685646402b.png)
 
@@ -62,6 +62,7 @@ Una vez que estamos en consola ejecutamos:
 	`poetry run alembic upgrade head`
 
  Anexo captura:
+
  ![Screenshot_4](https://user-images.githubusercontent.com/61600273/232625303-c94cce0c-169f-4217-86bc-a89e10c46521.png)
 
   Se mostrará que las migraciones se corren de manera exitosa, además se agregan un par de registros con usuarios de prueba para que puedan acceder al token de acceso y probar los demás endpoints.
