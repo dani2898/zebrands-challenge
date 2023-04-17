@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.interface_adapters.security import JWTBearer
 from app.domain.product_consult import (
     ProductConsultError
 )
@@ -18,6 +19,7 @@ router = APIRouter()
     "/{product_id}",
     response_model=int,
     status_code=status.HTTP_200_OK,
+    dependencies=[Depends(JWTBearer())]
 )
 async def get_count_of_consults_by_product_id(
     product_id: str,

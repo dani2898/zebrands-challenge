@@ -16,6 +16,9 @@ alembic = "^1.6.5"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 fastapi-jwt-auth = {extras = ["asymmetric"], version = "^0.5.0"}
 fastapi-mail = "1.0.1"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+
+
 [build-system]
 requires = ["poetry>=1.0.0"]
 build-backend = "poetry.masonry.api"

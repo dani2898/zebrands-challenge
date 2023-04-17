@@ -1,7 +1,12 @@
+import os
+
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import cast, Optional
 from uuid import uuid4
+
+from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
+from starlette.responses import JSONResponse
 
 from passlib.context import CryptContext
 
@@ -18,6 +23,8 @@ from .user_command_model import(
 )
 
 from .user_query_model import UserReadModel
+
+from .user_query_usecase import UserQueryUsecase
 
 class UserCommandUsecaseUnitOfWork(ABC):
     """Defines an interface based on Unit of Work pattern."""
@@ -49,7 +56,11 @@ class UserCommandUsecase(ABC):
     @abstractmethod
     def verify_password(self, plain_password: str, hashed_password: str):
         raise NotImplementedError
-    
+
+    @abstractmethod
+    def get_password_hash(self, password: str):
+        raise NotImplementedError
+       
     @abstractmethod
     def create_user(self, data: UserCreateModel)-> Optional[UserReadModel]:
         raise NotImplementedError
@@ -62,6 +73,9 @@ class UserCommandUsecase(ABC):
     def delete_user_by_id(self, user_id: str):
         raise NotImplementedError
 
+    @abstractmethod
+    def send_mail(self, message: str, user_query_usecase: UserQueryUsecase):
+        raise NotImplementedError
 class UserCommandUsecaseImpl(UserCommandUsecase):
     """
     UserCommandUsecaseImpl implements a command usecases related User entity.
@@ -156,3 +170,33 @@ class UserCommandUsecaseImpl(UserCommandUsecase):
         except Exception:
             self.uow.rollback()
             raise
+
+    async def send_mail(self, message, user_query_usecase):
+
+        conf = ConnectionConfig(
+            MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+            MAIL_FROM=os.getenv("MAIL_FROM"),
+            MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+            MAIL_PORT=587,
+            MAIL_SERVER="smtp.office365.com",
+            MAIL_TLS=True,
+            MAIL_SSL=False
+            )
+            
+        users = user_query_usecase.get_users()
+        emails = []
+
+        for user in users:
+            emails.append(user.email)
+
+        message = MessageSchema(
+            subject="Product",
+            recipients=emails,  # List of recipients, as many as you can pass
+            body=message,
+            subtype="html"
+            )
+    
+        fm = FastMail(conf)
+        await fm.send_message(message)
+    
+        return JSONResponse(status_code=200, content={"message": "email has been sent"})
