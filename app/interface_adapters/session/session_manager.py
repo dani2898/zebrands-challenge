@@ -61,6 +61,18 @@ from app.usecase.product_consult import (
     ProductConsultQueryUsecaseImpl,
 )
 
+# Brand
+
+from app.infrastructure.postgres.brand import (
+    BrandQueryServiceImpl,
+    )
+
+from app.usecase.brand import (
+    BrandQueryService,
+    BrandQueryUsecase,
+    BrandQueryUsecaseImpl,
+)
+
 def get_session() -> Iterator[Session]:
     session: Session = SessionLocal()
     try:
@@ -109,3 +121,9 @@ def product_consult_command_usecase(session: Session = Depends(get_session)) -> 
         product_consult_repository=product_consult_repository,
     )
     return ProductConsultCommandUsecaseImpl(uow)
+
+# BRAND DEFINITION SESSION MANAGER
+
+def brand_query_usecase(session: Session = Depends(get_session)) -> BrandQueryUsecase:
+    brand_query_service: BrandQueryService = BrandQueryServiceImpl(session)
+    return BrandQueryUsecaseImpl(brand_query_service)
