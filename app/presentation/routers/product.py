@@ -2,9 +2,9 @@
 import os
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi_mail import FastMail, MessageSchema,ConnectionConfig
-from starlette.responses import JSONResponse
 from typing import List
+
+from app.interface_adapters.security import JWTBearer
 
 from app.domain.product import (
     SkuAlreadyExistError,
@@ -19,6 +19,7 @@ from app.interface_adapters.session.session_manager import (
     product_query_usecase,
     product_command_usecase,
     product_consult_command_usecase,
+    user_command_usecase,
     user_query_usecase    
 )
 
@@ -35,44 +36,13 @@ from app.usecase.product_consult import (
 )
 
 from app.usecase.user import (
-    UserQueryUsecase,
-    UserReadModel
+    UserCommandUsecase,
+    UserQueryUsecase
 )
 
 router = APIRouter()
 
 # Send email
-
-async def send_mail(message, user_query_usecase):
-
-    conf = ConnectionConfig(
-        MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
-        MAIL_FROM=os.getenv("MAIL_FROM"),
-        MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
-        MAIL_PORT=587,
-        MAIL_SERVER="smtp.office365.com",
-        MAIL_TLS=True,
-        MAIL_SSL=False
-        )
-        
-    users = user_query_usecase.get_users()
-    emails = []
-
-    for user in users:
-        emails.append(user.email)
-
-    message = MessageSchema(
-        subject="Product",
-        recipients=emails,  # List of recipients, as many as you can pass
-        body=message,
-        subtype="html"
-        )
- 
-    fm = FastMail(conf)
-    await fm.send_message(message)
-    print(message)
- 
-    return JSONResponse(status_code=200, content={"message": "email has been sent"})
 
 @router.post(
     "/create",
@@ -83,16 +53,19 @@ async def send_mail(message, user_query_usecase):
             "model": ErrorMessageSkuAlreadyExists,
         },
     },
+    dependencies=[Depends(JWTBearer())]
 )
 async def create_product(
     data: ProductCreateModel,
     product_command_usecase: ProductCommandUsecase = Depends(product_command_usecase),
-    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase),
+    user_command_usecase: UserCommandUsecase = Depends(user_command_usecase),
+    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase)
 ):
     try:
         product = product_command_usecase.create_product(data)
 
-        await send_mail("New product added to the catalog", user_query_usecase)
+        #send mails
+        await user_command_usecase.send_mail("New product added to the catalog", user_query_usecase)
     except SkuAlreadyExistError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -116,19 +89,23 @@ async def create_product(
             "model": ErrorMessageProductNotFound,
         },
     },
+    dependencies=[Depends(JWTBearer())]
 )
 async def update_product(
     product_id: str,
     data: ProductUpdateModel,
     product_command_usecase: ProductCommandUsecase = Depends(product_command_usecase),
-    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase),
+    user_command_usecase: UserCommandUsecase = Depends(user_command_usecase),
+    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase)
 ):
     try:
         updated_product = product_command_usecase.update_product(
             product_id, data
         )
 
-        await send_mail(f"{updated_product.name} has been updated", user_query_usecase)
+        #send mails
+        await user_command_usecase.send_mail("New product added to the catalog", user_query_usecase)
+        
     except ProductNotFoundError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -154,17 +131,20 @@ async def update_product(
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorMessageProductNotFound,
         },
-    }
+    },
+    dependencies=[Depends(JWTBearer())]
 )
 async def delete_product(
     product_id: str,
     product_command_usecase: ProductCommandUsecase = Depends(product_command_usecase),
-    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase),
+    user_command_usecase: UserCommandUsecase = Depends(user_command_usecase),
+    user_query_usecase: UserQueryUsecase = Depends(user_query_usecase)
 ):
     try:
         product_command_usecase.delete_product_by_id(product_id)
         
-        await send_mail(f"Product with ID {product_id} has been deleted", user_query_usecase)
+        #send mails
+        await user_command_usecase.send_mail("New product added to the catalog", user_query_usecase)
 
     except ProductNotFoundError as e:
         raise HTTPException(

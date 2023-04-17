@@ -1,6 +1,8 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.interface_adapters.security import JWTBearer
+
 from app.domain.brand import (
     BrandNotFoundError
 )
@@ -34,7 +36,8 @@ credentials_exception = HTTPException(
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorMessageBrandNotFound,
         },
-    }
+    },
+    dependencies=[Depends(JWTBearer())]
 )
 async def list_brands(
     brand_query_usecase: BrandQueryUsecase = Depends(brand_query_usecase),

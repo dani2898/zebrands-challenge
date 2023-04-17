@@ -1,9 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.interface_adapters.security import (
-    JWTBearer
-)
+from app.interface_adapters.security import JWTBearer
 
 from app.domain.user import (
     EmailAlreadyExistError,
@@ -74,6 +72,7 @@ async def create_user(
             "model": ErrorMessageUserNotFound,
         },
     },
+    dependencies=[Depends(JWTBearer())]
 )
 async def update_user(
     user_id: str,
@@ -108,7 +107,8 @@ async def update_user(
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorMessageUserNotFound,
         },
-    }
+    },
+    dependencies=[Depends(JWTBearer())]
 )
 async def delete_user(
     user_id: str,
@@ -136,7 +136,8 @@ async def delete_user(
         status.HTTP_404_NOT_FOUND: {
             "model": ErrorMessageUserNotFound,
         },
-    }
+    },
+    dependencies=[Depends(JWTBearer())]
 )
 async def list_users(
     user_query_usecase: UserQueryUsecase = Depends(user_query_usecase),
