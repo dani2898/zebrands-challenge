@@ -1,11 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.config import AuthJWT
-from fastapi_jwt_auth.exceptions import AuthJWTException
-import app.config as conf
-from app.interface_adapters.security import (
-    JWTBearer
-)
-
+import app.auth as auth
 from app.interface_adapters.session.session_manager import (
     user_command_usecase,
     user_query_usecase
@@ -60,22 +54,14 @@ async def login(
         )
     
     try:
-        user_claims = {
-            "id": user.id,
-            "email": user.email,
-        }
-
-        Authorize = AuthJWT()
-        access_token = Authorize.create_access_token(
-            subject=user.id,
-            algorithm="RS256",
-            user_claims=user_claims
-        )
+        
+        access_token = auth.create_access_token(data.email)
+        
     except Exception as e:
         print(e)
 
     return {
-            "access_token": "access_token",
+            "access_token": access_token,
             "token_type": "Bearer"
         }
 

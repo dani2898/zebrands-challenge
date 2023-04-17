@@ -49,7 +49,11 @@ class UserCommandUsecase(ABC):
     @abstractmethod
     def verify_password(self, plain_password: str, hashed_password: str):
         raise NotImplementedError
-    
+
+    @abstractmethod
+    def get_password_hash(self, password: str):
+        raise NotImplementedError
+       
     @abstractmethod
     def create_user(self, data: UserCreateModel)-> Optional[UserReadModel]:
         raise NotImplementedError

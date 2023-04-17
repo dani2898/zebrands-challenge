@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 
 from fastapi import HTTPException, Request
@@ -9,11 +10,9 @@ import app.config as conf
 
 
 class Settings(BaseModel):
-    authjwt_algorithm: str = "RS512"
-    public_key: str = conf.RSA_KEYS["PUBLIC_KEY"]
-    private_key: str = conf.RSA_KEYS["PRIVATE_KEY"]
-    authjwt_access_token_expires: int = timedelta(minutes=conf.ACCESS_TOKEN_EXPIRE_MINUTES)
-
+    authjwt_algorithm: str = os.environ['ALGORITHM']
+    authjwt_secret_key: str =  os.environ['JWT_SECRET_KEY'] 
+    authjwt_access_token_expires: int = timedelta(minutes= int(os.environ['ACCESS_TOKEN_EXPIRE_MINUTES']) )
 
 class JWTBearer(HTTPBearer):
     def __init__(self, auto_error: bool = True):

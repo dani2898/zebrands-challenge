@@ -1,6 +1,9 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi_jwt_auth import AuthJWT
+
+from app.interface_adapters.security import (
+    JWTBearer
+)
 
 from app.domain.user import (
     EmailAlreadyExistError,
@@ -42,6 +45,7 @@ credentials_exception = HTTPException(
             "model": ErrorMessageEmailAlreadyExists,
         },
     },
+    dependencies=[Depends(JWTBearer())]
 )
 async def create_user(
     data: UserCreateModel,
