@@ -12,7 +12,7 @@ El desarrollo de los contenedores se realiza por medio de docker.
 
 En este caso se generan y levantan dos imágenes:
 1. Contenedor de API para manejo de productos y usuarios
-2. Un pre-build de postgresq
+2. Un pre-build de postgresql
 
 En caso de que no se cuente con una configuración de docker en el equipo, favor de seguir los pasos explicados en el siguiente enlace:
 
