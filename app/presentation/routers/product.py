@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.domain.product import (
@@ -16,6 +17,7 @@ from app.interface_adapters.session.session_manager import (
 
 from app.usecase.product import (
     ProductCommandUsecase,
+    ProductQueryUsecase,
     ProductCreateModel,
     ProductUpdateModel,
     ProductReadModel
@@ -116,3 +118,32 @@ async def delete_product(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+    
+@router.get(
+    "/",
+    response_model=List[ProductReadModel],
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorMessageProductNotFound,
+        },
+    }
+)
+async def list_products(
+    product_query_usecase: ProductQueryUsecase = Depends(product_query_usecase),
+):
+    try:
+        products = product_query_usecase.get_products()
+    except Exception as e:
+        print(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    if len(products) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=ProductNotFoundError.message,
+        )
+
+    return products

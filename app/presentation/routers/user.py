@@ -139,7 +139,7 @@ async def list_users(
 ):
     try:
         users = user_query_usecase.get_users()
-    except Exception:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

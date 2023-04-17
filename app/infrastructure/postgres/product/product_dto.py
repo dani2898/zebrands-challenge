@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from sqlalchemy import Boolean, Column, Integer, String, DateTime, Numeric
 from typing import Union
@@ -20,7 +19,7 @@ class ProductDTO(Base):
     stock: Union[int, Column] = Column(Integer, nullable=True)
     price: Union[Numeric, Column] = Column(Numeric, nullable=True)
     status: Union[bool, Column] = Column(Boolean, nullable=True)
-    brand_id: Union[int, Column] = Column(String(255), nullable=True)
+    brand_id: Union[str, Column] = Column(String(255), nullable=True)
     created_at: Union[datetime, Column] = Column(DateTime, index=True, nullable=False)
     updated_at: Union[datetime, Column] = Column(DateTime, index=True, nullable=False)
 
@@ -47,7 +46,7 @@ class ProductDTO(Base):
             stock=self.stock,
             price=self.price,
             status=self.status,
-            brand_id=self.brand_id,
+            brand_id=str(self.brand_id),
             created_at=self.created_at,
             updated_at=self.updated_at,
         )
